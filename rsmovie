@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+{
+  echo
+  printf "\tWill execute sync in 5 seconds.\n"
+  printf "\tPress ^C to exit or enter to skip timeout."
+  echo;
+}
+
+## timeout
+read -t 5
+
+
+for var in "$@"
+do
+    if ! [ -e "$var" ]
+    then
+      echo "$var not real yo"
+      exit 1
+    fi
+
+    echo "Will sync $var to /mnt/Movies/"
+
+    echo 'Syncing...'
+
+    rsync -avr -P $var /mnt/Movies/
+
+    printf "\n\n"
+done
+
