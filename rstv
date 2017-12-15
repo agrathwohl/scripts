@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [[ $1 == *"help"* ]] || [[ $1 == *"-h"* ]] || [[ $1 == *"--help"* ]]; then
+  printf "USAGE:\n"
+  printf "\t$./rstv 'SHOW NAME' Season# File1.avi File2.mp4 File3.mov\n"
+  exit 0
+fi
+
+show=$1
+season=$2
+
+
+shift 2
+
+
+{
+  echo
+  echo "$@"
+  printf "\tWill execute sync in 5 seconds.\n"
+  printf "\tPress ^C to exit or enter to skip timeout.\n"
+  printf "\tSync request details:\n"
+  echo
+  printf "\tShow: $show\n"
+  printf "\tSeason: $season\n\n"
+  echo "Things to sync: $@"
+  echo;
+}
+
+## timeout
+read -t 5
+
+mkdir -p "/mnt/TV/$show/Season $season/"
+
+for var in "$@"
+do
+    if ! [ -e "$var" ]
+    then
+      echo "$var not real yo"
+      exit 1
+    fi
+
+    target=${var%/}
+
+    echo "Will sync $var to /mnt/TV/$show/Season $season/"
+
+    echo 'Syncing...'
+
+    rsync -avr -P "$target" "/mnt/TV/$show/Season $season/"
+
+    printf "\n\n"
+done
+
