@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ $1 == *"help"* ]] || [[ $1 == *"-h"* ]] || [[ $1 == *"--help"* ]]; then
+  printf "USAGE:\n"
+  printf "\t$./rsmovie File1.avi File2.mp4 File3.mov\n"
+  exit 0
+fi
+
 
 {
   echo
@@ -24,7 +30,7 @@ do
 
     echo 'Syncing...'
 
-    rsync -avr -P $var /mnt/Movies/
+    rsync -avr -P "$var" /mnt/Movies/
 
     printf "\n\n"
 done
