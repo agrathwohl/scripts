@@ -30,7 +30,7 @@ do
 
     echo 'Syncing...'
 
-    rsync -avr -P "$var" /mnt/Movies/
+    rsync --bwlimit=500000 -avr -P "$var" /mnt/Movies/
 
     printf "\n\n"
 done

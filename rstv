@@ -45,7 +45,7 @@ do
 
     echo 'Syncing...'
 
-    rsync -avr -P "$target" "/mnt/TV/$show/Season $season/"
+    rsync --bw-limit=50000 -avr -P "$target" "/mnt/TV/$show/Season $season/"
 
     printf "\n\n"
 done
