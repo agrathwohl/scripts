@@ -10,6 +10,8 @@ ISAVC=$(ffprobe -v error -select_streams v:0 -show_entries stream=is_avc -of def
 VIDCODEC="VID CODEC"
 AUDCODEC=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=nw=1:nk=1 $FILEIN)
 CHANS=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=nw=1:nk=1 $FILEIN)
+TITLERAW=$(mediainfo $FILEIN --output=JSON | jq '.media.track[0].Title?')
+TITLE=${TITLERAW//\"/""}
 
 if [ "$ISAVC" == "true" ]; then
   VIDCODEC="AVC x264"
@@ -19,7 +21,7 @@ fi
 
 printf "\tTITLE:\n"
 
-echo "${FLONG} 0000 $(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $FILEIN)p SRC ${VIDCODEC} $(echo $AUDCODEC | tr "[:lower:]" "[:upper:]") ${CHANS}.0"
+echo "${TITLE} 0000 $(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $FILEIN)p SRC ${VIDCODEC} $(echo $AUDCODEC | tr "[:lower:]" "[:upper:]") ${CHANS}.0"
 
 printf "\n\n"
 
