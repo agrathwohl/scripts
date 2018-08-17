@@ -1,16 +1,16 @@
 #!/bin/bash
 
 FILEIN=$1
-FILE=$(basename $FILEIN)
+FILE=$(basename "$FILEIN")
 FNAME=${FILE:0:5}
 FLONG=${FILE:0:10}
-DIR=$(dirname $FILEIN)
-INFO=`mediainfo ${FILEIN}`
-ISAVC=$(ffprobe -v error -select_streams v:0 -show_entries stream=is_avc -of default=nw=1:nk=1 $FILEIN)
+DIR=$(dirname "$FILEIN")
+INFO=`mediainfo "${FILEIN}"`
+ISAVC=$(ffprobe -v error -select_streams v:0 -show_entries stream=is_avc -of default=nw=1:nk=1 "$FILEIN")
 VIDCODEC="VID CODEC"
-AUDCODEC=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=nw=1:nk=1 $FILEIN)
-CHANS=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=nw=1:nk=1 $FILEIN)
-TITLERAW=$(mediainfo $FILEIN --output=JSON | jq '.media.track[0].Title?')
+AUDCODEC=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=nw=1:nk=1 "$FILEIN")
+CHANS=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=nw=1:nk=1 "$FILEIN")
+TITLERAW=$(mediainfo "$FILEIN" --output=JSON | jq '.media.track[0].Title?')
 TITLE=${TITLERAW//\"/""}
 
 if [ "$ISAVC" == "true" ]; then
@@ -21,17 +21,17 @@ fi
 
 printf "\tTITLE:\n"
 
-echo "${TITLE} 0000 $(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $FILEIN)p SRC ${VIDCODEC} $(echo $AUDCODEC | tr "[:lower:]" "[:upper:]") ${CHANS}.0"
+echo "${TITLE} 0000 $(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 "$FILEIN")p SRC ${VIDCODEC} $(echo $AUDCODEC | tr "[:lower:]" "[:upper:]") ${CHANS}.0"
 
 printf "\n\n"
 
 # ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate -of default=nw=1:nk=1 input.mp4
 
-transmission-create -p -t "https://concertos.live/announce/94En4S8_fy6SQWfiquUUEsbhEJ-sGyMVbBAGMPhvCr8" -o $FNAME.torrent $DIR
+transmission-create -p -t "https://concertos.live/announce/94En4S8_fy6SQWfiquUUEsbhEJ-sGyMVbBAGMPhvCr8" -o "$FNAME".torrent $DIR
 
-echo "${INFO}" > $FNAME.mediainfo.txt
+echo "${INFO}" > "$FNAME".mediainfo.txt
 
-mkdir -p ${FNAME}_screens
+mkdir -p "${FNAME}_screens"
 
 printf "\tOutputting screenshots to ${FNAME}_screens...\n"
 
@@ -39,11 +39,11 @@ declare -a ffscreens=("-ss 00:01:00" "-ss 00:05:00" "-ss 00:12:00" "-ss 00:20:00
 
 COUNT=0
 
-ffmpeg -y -v quiet -ss 00:00:15 -i $FILEIN -vframes 1 ${FNAME}_screens/screen_$COUNT.png
+ffmpeg -y -v quiet -ss 00:00:15 -i "$FILEIN" -vframes 1 "${FNAME}_screens/screen_$COUNT.png"
 
 for s in "${ffscreens[@]}"
   do
-    ffmpeg -y -v quiet $s -i $FILEIN -vframes 1 ${FNAME}_screens/screen_$COUNT.png
+    ffmpeg -y -v quiet $s -i "$FILEIN" -vframes 1 "${FNAME}_screens/screen_$COUNT.png"
     if [ $? -ne 0 ]; then
       break
     fi
@@ -51,19 +51,19 @@ for s in "${ffscreens[@]}"
   done
 
 #while [ $? -e 0 ]; do
-#  ffmpeg -i $FILEIN -ss 00:00:15 -vframes 1 ${FNAME}_screens/screen_$COUNT.png
+#  ffmpeg -i "$FILEIN" -ss 00:00:15 -vframes 1 ${FNAME}_screens/screen_$COUNT.png
 #  COUNT=$((COUNT + 1))
 #done
 
-#ffmpeg -v quiet -i $FILEIN -vf "fps=1/600" ${FNAME}_screens/screen_%d.png
+#ffmpeg -v quiet -i "$FILEIN" -vf "fps=1/600" ${FNAME}_screens/screen_%d.png
 
 printf "\tdone\n\n"
 
 printf "\n\tTORRENT:\n"
-echo "$(realpath $FNAME.torrent)"
+echo "$(realpath "$FNAME".torrent)"
 
 printf "\n\tMEDIAINFO:\n"
-echo "$(realpath $FNAME.mediainfo.txt)"
+echo "$(realpath "$FNAME".mediainfo.txt)"
 
 printf "\n\tSCREENS:\n"
 echo "$(realpath ${FNAME}_screens)"
